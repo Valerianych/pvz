@@ -23,6 +23,8 @@ public class EndDayPanel : MonoBehaviour
     public Button upgradesButton;
     public Button nextDayButton;
 
+    private bool moneyAdjustmentApplied;
+
     private void Start()
     {
         if (panel != null)
@@ -46,13 +48,24 @@ public class EndDayPanel : MonoBehaviour
             return;
 
         int penalties = results.GetPenalty();
-        int total = results.GetTotalMoneyForDay();
+        int dayIncome = results.earnedMoney;
         float rating = results.GetRating();
 
         int goalBonus = 0;
 
         if (DayGoalManager.Instance != null)
             goalBonus = DayGoalManager.Instance.GetGoalBonus();
+
+        int finalDayResult = dayIncome - penalties + goalBonus;
+        int moneyAdjustment = goalBonus - penalties;
+
+        if (!moneyAdjustmentApplied)
+        {
+            moneyAdjustmentApplied = true;
+
+            if (MoneyManager.Instance != null)
+                MoneyManager.Instance.AddMoney(moneyAdjustment);
+        }
 
         if (titleText != null)
             titleText.text = "Рабочий день завершён";
@@ -67,16 +80,17 @@ public class EndDayPanel : MonoBehaviour
             mistakesText.text = "Ошибок выдачи: " + results.mistakes;
 
         if (earnedMoneyText != null)
-            earnedMoneyText.text = "Доход: " + results.earnedMoney + " ₽";
+            earnedMoneyText.text = "Доход: " + dayIncome + " ₽";
 
         if (penaltiesText != null)
             penaltiesText.text = "Штрафы: -" + penalties + " ₽";
 
         if (totalMoneyText != null)
-            totalMoneyText.text = "Итог за день: " + (total + goalBonus) + " ₽";
+            totalMoneyText.text = "Итог за день: " + finalDayResult + " ₽";
 
         if (ratingText != null)
             ratingText.text = "Рейтинг ПВЗ: " + rating.ToString("0.0") + " ★";
+
         if (goalsText != null && DayGoalManager.Instance != null)
             goalsText.text = DayGoalManager.Instance.GetGoalsText();
 
@@ -86,6 +100,8 @@ public class EndDayPanel : MonoBehaviour
 
     private void StartNextDay()
     {
+        moneyAdjustmentApplied = false;
+
         if (panel != null)
             panel.SetActive(false);
 
@@ -100,8 +116,8 @@ public class EndDayPanel : MonoBehaviour
 
         if (GameManager.Instance != null)
             GameManager.Instance.NextDay();
+
         if (DayGoalManager.Instance != null)
             DayGoalManager.Instance.SetupGoalsForDay();
     }
-
 }
