@@ -42,4 +42,27 @@ public class StorageSystem : MonoBehaviour
 
         return null;
     }
+    public bool HasAnyBoxes()
+    {
+        return boxes.Count > 0;
+    }
+
+    public string GetRandomStoredOrderNumber()
+    {
+        if (boxes.Count == 0)
+            return "";
+
+        int index = Random.Range(0, boxes.Count);
+        int currentIndex = 0;
+
+        foreach (string orderNumber in boxes.Keys)
+        {
+            if (currentIndex == index)
+                return orderNumber;
+
+            currentIndex++;
+        }
+
+        return "";
+    }
 }

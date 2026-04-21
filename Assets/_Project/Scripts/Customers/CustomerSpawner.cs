@@ -63,6 +63,9 @@ public class CustomerSpawner : MonoBehaviour
 
     private string GetOrderNumberForCustomer()
     {
+        if (StorageSystem.Instance != null && StorageSystem.Instance.HasAnyBoxes())
+            return StorageSystem.Instance.GetRandomStoredOrderNumber();
+
         return OrderNumberGenerator.Generate();
     }
 
