@@ -16,6 +16,8 @@ public class EndDayPanel : MonoBehaviour
     public TMP_Text penaltiesText;
     public TMP_Text totalMoneyText;
     public TMP_Text ratingText;
+    public TMP_Text goalsText;
+    public TMP_Text goalBonusText;
 
     [Header("Кнопки")]
     public Button upgradesButton;
@@ -47,6 +49,11 @@ public class EndDayPanel : MonoBehaviour
         int total = results.GetTotalMoneyForDay();
         float rating = results.GetRating();
 
+        int goalBonus = 0;
+
+        if (DayGoalManager.Instance != null)
+            goalBonus = DayGoalManager.Instance.GetGoalBonus();
+
         if (titleText != null)
             titleText.text = "Рабочий день завершён";
 
@@ -66,10 +73,15 @@ public class EndDayPanel : MonoBehaviour
             penaltiesText.text = "Штрафы: -" + penalties + " ₽";
 
         if (totalMoneyText != null)
-            totalMoneyText.text = "Итог за день: " + total + " ₽";
+            totalMoneyText.text = "Итог за день: " + (total + goalBonus) + " ₽";
 
         if (ratingText != null)
             ratingText.text = "Рейтинг ПВЗ: " + rating.ToString("0.0") + " ★";
+        if (goalsText != null && DayGoalManager.Instance != null)
+            goalsText.text = DayGoalManager.Instance.GetGoalsText();
+
+        if (goalBonusText != null)
+            goalBonusText.text = "Бонус за цели: +" + goalBonus + " ₽";
     }
 
     private void StartNextDay()
@@ -88,5 +100,8 @@ public class EndDayPanel : MonoBehaviour
 
         if (GameManager.Instance != null)
             GameManager.Instance.NextDay();
+        if (DayGoalManager.Instance != null)
+            DayGoalManager.Instance.SetupGoalsForDay();
     }
+
 }
